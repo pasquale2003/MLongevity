@@ -1,6 +1,7 @@
 import json
 import os
 from collections import Counter
+import math
 
 
 def load_data(file_path):
@@ -29,6 +30,43 @@ def count_distribution(data, key):
     """Conta la distribuzione di valori per una determinata chiave."""
     return Counter(instance.get(key) for instance in data if key in instance)
 
+def load_data(file_path):
+    """Carica il file JSON e restituisce i dati."""
+    with open(file_path, 'r') as file:
+        return json.load(file)
+
+
+def calculate_average(data, key):
+    """Calcola la media di un dato numerico specifico."""
+    values = [instance.get(key) for instance in data if isinstance(instance.get(key), (int, float))]
+    return sum(values) / len(values) if values else 0
+
+
+def calculate_std_dev(data, key, mean):
+    """Calcola la deviazione standard di un dato numerico specifico."""
+    values = [instance.get(key) for instance in data if isinstance(instance.get(key), (int, float))]
+    variance = sum((x - mean) ** 2 for x in values) / len(values) if values else 0
+    return math.sqrt(variance)
+
+
+def categorize_age(data, mean, std_dev):
+    """Categorizza le persone in base all'età rispetto alla media e alla deviazione standard."""
+    categories = {
+        "meno della media": 0,
+        "nella media": 0,
+        "più della media": 0
+    }
+
+    for instance in data:
+        age = instance.get("age")
+        if isinstance(age, (int, float)):
+            if age < (mean - std_dev):
+                categories["meno della media"] += 1
+            elif age > (mean + std_dev):
+                categories["più della media"] += 1
+            else:
+                categories["nella media"] += 1
+    return categories
 
 def main():
     # Caricare i dati dal file JSON
@@ -71,6 +109,13 @@ def main():
         "family_cholesterol": count_categorical(data, 'family_cholesterol', 'y')
     }
 
+    # Calcolo media e deviazione standard dell'età
+    avg_age = calculate_average(data, 'age')
+    std_dev_age = calculate_std_dev(data, 'age', avg_age)
+
+    # Categorizzazione delle età
+    age_categories = categorize_age(data, avg_age, std_dev_age)
+
     # Stampare i risultati
     print(f"Numero di istanze: {num_instances}")
     print(f"Età media: {avg_age:.2f}")
@@ -93,6 +138,11 @@ def main():
     print(f"Colesterolo medio: {avg_cholesterol:.2f}")
     print(f"Malattie riscontrate: {diseases}")
     print(f"Storia familiare di malattie: {family_history}")
+
+    # Stampare i risultati
+    print(f"\nEtà media: {avg_age:.2f}")
+    print(f"Deviazione standard dell'età: {std_dev_age:.2f}")
+    print(f"Distribuzione delle categorie di età: {age_categories}")
 
 if __name__ == '__main__':
     main()
