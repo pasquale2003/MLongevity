@@ -70,7 +70,7 @@ def categorize_age(data, mean, std_dev):
 
 def main():
     # Caricare i dati dal file JSON
-    data = load_data('../data/data.json')
+    data = load_data('data.json')
 
     # Eseguire l'analisi
     num_instances = count_instances(data)
