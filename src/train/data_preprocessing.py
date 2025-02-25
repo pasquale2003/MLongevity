@@ -1,6 +1,6 @@
 import json
 import numpy as np
-from imblearn.over_sampling import SMOTE
+
 
 def read_json(file_path):
     """Legge il file JSON e restituisce i dati."""
@@ -8,15 +8,15 @@ def read_json(file_path):
         data = json.load(file)
     return data
 
+
 def preprocess_data(data):
-    """Preprocessa i dati e applica SMOTE per bilanciare le classi."""
+    """Preprocessa i dati per la regressione dell'età alla morte."""
     processed_data = []
-    target = []  # Qui aggiungiamo la variabile target (survival)
+    target = []  # L'età alla morte sarà la nostra variabile target
 
     for entry in data:
         # Estrai i dati numerici
         numeric_entry = [
-            entry['age'],
             entry['weight'],
             entry['height'],
             entry['sys_bp'],
@@ -44,35 +44,30 @@ def preprocess_data(data):
         family_heart_disease = 1 if entry['family_heart_disease'] == 'y' else 0
         family_cholesterol = 1 if entry['family_cholesterol'] == 'y' else 0
 
-        # Logica per determinare la variabile 'survival'
-        if entry['age'] > 80 and entry['diabetes'] == 'n' and entry['asthma'] == 'n' and entry['family_heart_disease'] == 'n':
-            survival = 1  # Alta sopravvivenza
-        else:
-            survival = 0  # Bassa sopravvivenza
+        # Aggiungi i dati preprocessati
+        processed_data.append(numeric_entry + [
+            sex, smoker, cannabis, opioids, other_drugs, addiction, asthma, immune_defic,
+            hds, nic_other, diabetes, family_cancer, family_heart_disease, family_cholesterol
+        ])
 
-        # Aggiungi i dati preprocessati e il target
-        processed_data.append(numeric_entry + [sex, smoker, cannabis, opioids, other_drugs, addiction, asthma, immune_defic, hds, nic_other, diabetes, family_cancer, family_heart_disease, family_cholesterol])
-        target.append(survival)
+        # La variabile target è direttamente l'età alla morte
+        target.append(entry['age'])
 
     # Converte in array NumPy
     X = np.array(processed_data)
     y = np.array(target)
 
-    # Applica SMOTE per bilanciare le classi
-    smote = SMOTE(random_state=42)
-    X_res, y_res = smote.fit_resample(X, y)
+    return X, y
 
-    return X_res, y_res
 
 # Carica i dati JSON
 data = read_json('../data/data.json')
 
-# Preprocessa i dati e applica SMOTE
-X_res, y_res = preprocess_data(data)
+# Preprocessa i dati
+X, y = preprocess_data(data)
 
-# Salva i dati bilanciati in un file .npz
-np.savez('../data/processed_data.npz', X_res=X_res, y_res=y_res)
+# Salva i dati preprocessati in un file .npz
+np.savez('../data/processed_data.npz', X=X, y=y)
 
-# Stampa i risultati per verificare l'equilibrio delle classi
-print(f"Dimensioni dopo SMOTE - X_res: {X_res.shape}, y_res: {y_res.shape}")
-print(f"Distribuzione delle classi dopo SMOTE: {np.bincount(y_res)}")
+# Stampa i risultati per verificare le dimensioni
+print(f"Dimensioni del dataset - X: {X.shape}, y: {y.shape}")
