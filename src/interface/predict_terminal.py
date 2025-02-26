@@ -40,32 +40,32 @@ def preprocess_single_data(entry):
 def collect_user_data():
     print("\n🔍 Inserisci i dati per la previsione:\n")
     try:
-        weight_lb = float(input("📌 Inserisci peso (in libbre): "))
-        height_inch = float(input("📌 Inserisci altezza (in pollici): "))
-        sys_bp = int(input("📌 Inserisci pressione sistolica (mmHg): "))
-        num_meds = int(input("📌 Inserisci il numero di farmaci che prendi: "))
+        weight_lb = float(input("Inserisci peso (in libbre): "))
+        height_inch = float(input("Inserisci altezza (in pollici): "))
+        sys_bp = int(input("Inserisci pressione sistolica (mmHg): "))
+        num_meds = int(input("Inserisci il numero di farmaci che prendi: "))
 
-        occup_danger = int(input("📌 Pericolosità della tua occupazione (1 = basso, 2 = medio, 3 = alto): "))
-        ls_danger = int(input("📌 Pericolosità del tuo stile di vita (1 = basso, 2 = medio, 3 = alto): "))
+        occup_danger = int(input("Pericolosità della tua occupazione (1 = basso, 2 = medio, 3 = alto): "))
+        ls_danger = int(input("Pericolosità del tuo stile di vita (1 = basso, 2 = medio, 3 = alto): "))
 
-        drinks_aweek = int(input("📌 Quante bevute fai a settimana? "))
-        major_surgery_num = int(input("📌 Quanti interventi chirurgici importanti hai avuto? "))
-        cholesterol = int(input("📌 Inserisci livello di colesterolo: "))
+        drinks_aweek = int(input("Quante bevute fai a settimana? "))
+        major_surgery_num = int(input("Quanti interventi chirurgici importanti hai avuto? "))
+        cholesterol = int(input("Inserisci livello di colesterolo: "))
 
-        sex = input("📌 Sesso (m per maschio, f per femmina): ").lower()
-        smoker = input("📌 Sei fumatore? (y/n): ").lower()
-        nic_other = input("📌 Usi altre sostanze nicotiniche? (y/n): ").lower()
-        cannabis = input("📌 Usi cannabis? (y/n): ").lower()
-        opioids = input("📌 Usi oppioidi? (y/n): ").lower()
-        other_drugs = input("📌 Usi altre droghe? (y/n): ").lower()
-        addiction = input("📌 Hai dipendenze? (y/n): ").lower()
-        diabetes = input("📌 Hai il diabete? (y/n): ").lower()
-        hds = input("📌 Storia familiare di malattie gravi? (y/n): ").lower()
-        asthma = input("📌 Hai l'asma? (y/n): ").lower()
-        immune_defic = input("📌 Hai una deficienza immunitaria? (y/n): ").lower()
-        family_cancer = input("📌 Storia familiare di cancro? (y/n): ").lower()
-        family_heart_disease = input("📌 Storia familiare di malattie cardiache? (y/n): ").lower()
-        family_cholesterol = input("📌 Storia familiare di colesterolo alto? (y/n): ").lower()
+        sex = input("Sesso (m per maschio, f per femmina): ").lower()
+        smoker = input("Sei fumatore? (y/n): ").lower()
+        nic_other = input("Usi altre sostanze nicotiniche? (y/n): ").lower()
+        cannabis = input("Usi cannabis? (y/n): ").lower()
+        opioids = input("Usi oppioidi? (y/n): ").lower()
+        other_drugs = input("Usi altre droghe? (y/n): ").lower()
+        addiction = input("Hai dipendenze? (y/n): ").lower()
+        diabetes = input("Hai il diabete? (y/n): ").lower()
+        hds = input("Storia familiare di malattie gravi? (y/n): ").lower()
+        asthma = input("Hai l'asma? (y/n): ").lower()
+        immune_defic = input("Hai una deficienza immunitaria? (y/n): ").lower()
+        family_cancer = input("Storia familiare di cancro? (y/n): ").lower()
+        family_heart_disease = input("Storia familiare di malattie cardiache? (y/n): ").lower()
+        family_cholesterol = input("Storia familiare di colesterolo alto? (y/n): ").lower()
 
         user_data = {
             'weight': weight_lb,
@@ -95,7 +95,7 @@ def collect_user_data():
 
         return user_data
     except ValueError:
-        print("\n⚠️ Errore: Inserisci solo numeri validi per i valori numerici!\n")
+        print("\nErrore: Inserisci solo numeri validi per i valori numerici!\n")
         return collect_user_data()
 
 # Carica il modello salvato
@@ -111,5 +111,5 @@ processed_user_data = preprocess_single_data(user_data)
 predicted_age = model.predict(processed_user_data)[0]
 
 # Stampa la previsione dell'età
-print("\n🔮 **Previsione della longevità**:")
-print(f"🟢 Età stimata alla morte: {predicted_age:.2f} anni")
+print("\n**Previsione della longevità**:")
+print(f"Età stimata alla morte: {predicted_age:.2f} anni")
