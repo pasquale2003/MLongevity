@@ -52,24 +52,31 @@ def preprocess_test_data(data):
 # Carica il modello
 model = joblib.load('../model/mlongevity_model.pkl')
 
-# Carica i dati di test
-test_data = load_test_data('../data/data_test.json')  # Sostituisci con il tuo file JSON di test
+# Carica i dati di test dal file JSON
+test_data = load_test_data('../data/data_test.json')
 
 # Preprocessa i dati di test
-X_test, true_ages = preprocess_test_data(test_data)
+X_test, y_test = preprocess_test_data(test_data)
 
-# Effettua la previsione
+# Controllo del numero di feature
+expected_features = 23  # Il modello è stato addestrato con 23 feature
+if X_test.shape[1] != expected_features:
+    print(f"⚠️ Errore: Numero di feature errato! ({X_test.shape[1]} invece di {expected_features})")
+    X_test = X_test[:, :expected_features]  # Corregge se necessario
+    print(f"✅ Corretto! Nuovo numero di feature: {X_test.shape[1]}")
+
+# Previsione con il modello
 predicted_ages = model.predict(X_test)
 
 # Stampa le previsioni rispetto ai valori reali
 print("\n📌 Confronto tra età predetta e reale:\n")
-for i in range(len(true_ages)):
-    print(f"👤 Persona {i+1}: Predetto = {predicted_ages[i]:.2f}, Reale = {true_ages[i]}")
+for i in range(len(y_test)):
+    print(f"👤 Persona {i+1}: Predetto = {predicted_ages[i]:.2f}, Reale = {y_test[i]}")
 
 # Calcola metriche di errore
-mae = mean_absolute_error(true_ages, predicted_ages)
-mse = mean_squared_error(true_ages, predicted_ages)
-r2 = r2_score(true_ages, predicted_ages)
+mae = mean_absolute_error(y_test, predicted_ages)
+mse = mean_squared_error(y_test, predicted_ages)
+r2 = r2_score(y_test, predicted_ages)
 
 print("\n📊 **Metriche del modello sui dati di test**:")
 print(f"🔹 Mean Absolute Error (MAE): {mae:.2f}")
