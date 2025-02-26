@@ -6,11 +6,11 @@ import numpy as np
 
 # Carica i dati preprocessati bilanciati
 data = np.load('../data/processed_data.npz')
-X_res = data['X_res']
-y_res = data['y_res']
+X = data['X']
+y = data['y']
 
 # Divisione in training e test set
-X_train, X_test, y_train, y_test = train_test_split(X_res, y_res, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Normalizzazione dei dati (opzionale, Random Forest non la richiede)
 # from sklearn.preprocessing import StandardScaler
