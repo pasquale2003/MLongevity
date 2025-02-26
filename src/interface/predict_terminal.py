@@ -1,12 +1,10 @@
 import joblib
 import numpy as np
 
-
-# Funzione di preprocessamento dei dati (senza conversioni)
+# Funzione di preprocessamento dei dati (senza l'età)
 def preprocess_single_data(entry):
     # Estrai i dati numerici
     numeric_entry = [
-        entry['age'],
         entry['weight'],  # Peso in libbre
         entry['height'],  # Altezza in pollici
         entry['sys_bp'],
@@ -38,75 +36,67 @@ def preprocess_single_data(entry):
     return np.array([numeric_entry + [sex, smoker, cannabis, opioids, other_drugs, addiction, asthma, immune_defic, hds,
                                       nic_other, diabetes, family_cancer, family_heart_disease, family_cholesterol]])
 
-
 # Funzione per raccogliere i dati dell'utente
 def collect_user_data():
-    # Raccolta dei dati da terminale
-    age = int(input("Inserisci età: "))
-    weight_lb = float(input("Inserisci peso (in libbre): "))  # Peso in libbre
-    height_inch = float(input("Inserisci altezza (in pollici): "))  # Altezza in pollici
-    sys_bp = int(input("Inserisci pressione sistolica (mmHg): "))
-    num_meds = int(input("Inserisci il numero di farmaci che prendi: "))
+    print("\n🔍 Inserisci i dati per la previsione:\n")
+    try:
+        weight_lb = float(input("📌 Inserisci peso (in libbre): "))
+        height_inch = float(input("📌 Inserisci altezza (in pollici): "))
+        sys_bp = int(input("📌 Inserisci pressione sistolica (mmHg): "))
+        num_meds = int(input("📌 Inserisci il numero di farmaci che prendi: "))
 
-    # Modificato per valori tra 1 e 3
-    occup_danger = int(input("La tua occupazione è pericolosa (1 per basso, 2 per medio, 3 per alto): "))
-    while occup_danger not in [1, 2, 3]:
-        print("Valore non valido. Devi inserire 1, 2 o 3.")
-        occup_danger = int(input("La tua occupazione è pericolosa (1 per basso, 2 per medio, 3 per alto): "))
+        occup_danger = int(input("📌 Pericolosità della tua occupazione (1 = basso, 2 = medio, 3 = alto): "))
+        ls_danger = int(input("📌 Pericolosità del tuo stile di vita (1 = basso, 2 = medio, 3 = alto): "))
 
-    ls_danger = int(input("Il tuo stile di vita è pericoloso (1 per basso, 2 per medio, 3 per alto): "))
-    while ls_danger not in [1, 2, 3]:
-        print("Valore non valido. Devi inserire 1, 2 o 3.")
-        ls_danger = int(input("Il tuo stile di vita è pericoloso (1 per basso, 2 per medio, 3 per alto): "))
+        drinks_aweek = int(input("📌 Quante bevute fai a settimana? "))
+        major_surgery_num = int(input("📌 Quanti interventi chirurgici importanti hai avuto? "))
+        cholesterol = int(input("📌 Inserisci livello di colesterolo: "))
 
-    drinks_aweek = int(input("Quante bevute alla settimana? "))
-    major_surgery_num = int(input("Hai subito interventi chirurgici importanti (numero): "))
-    cholesterol = int(input("Inserisci livello di colesterolo: "))
-    sex = input("Inserisci sesso (m per maschio, f per femmina): ").lower()
-    smoker = input("Sei fumatore? (y per sì, n per no): ").lower()
-    nic_other = input("Usi altre sostanze nicotiniche? (y per sì, n per no): ").lower()
-    cannabis = input("Usi cannabis? (y per sì, n per no): ").lower()
-    opioids = input("Usi oppioidi? (y per sì, n per no): ").lower()
-    other_drugs = input("Usi altre droghe? (y per sì, n per no): ").lower()
-    addiction = input("Hai dipendenze? (y per sì, n per no): ").lower()
-    diabetes = input("Hai il diabete? (y per sì, n per no): ").lower()
-    hds = input("Hai una storia familiare di malattie gravi? (y per sì, n per no): ").lower()
-    asthma = input("Hai l'asma? (y per sì, n per no): ").lower()
-    immune_defic = input("Hai una deficienza immunitaria? (y per sì, n per no): ").lower()
-    family_cancer = input("Hai una storia familiare di cancro? (y per sì, n per no): ").lower()
-    family_heart_disease = input("Hai una storia familiare di malattie cardiache? (y per sì, n per no): ").lower()
-    family_cholesterol = input("Hai una storia familiare di colesterolo alto? (y per sì, n per no): ").lower()
+        sex = input("📌 Sesso (m per maschio, f per femmina): ").lower()
+        smoker = input("📌 Sei fumatore? (y/n): ").lower()
+        nic_other = input("📌 Usi altre sostanze nicotiniche? (y/n): ").lower()
+        cannabis = input("📌 Usi cannabis? (y/n): ").lower()
+        opioids = input("📌 Usi oppioidi? (y/n): ").lower()
+        other_drugs = input("📌 Usi altre droghe? (y/n): ").lower()
+        addiction = input("📌 Hai dipendenze? (y/n): ").lower()
+        diabetes = input("📌 Hai il diabete? (y/n): ").lower()
+        hds = input("📌 Storia familiare di malattie gravi? (y/n): ").lower()
+        asthma = input("📌 Hai l'asma? (y/n): ").lower()
+        immune_defic = input("📌 Hai una deficienza immunitaria? (y/n): ").lower()
+        family_cancer = input("📌 Storia familiare di cancro? (y/n): ").lower()
+        family_heart_disease = input("📌 Storia familiare di malattie cardiache? (y/n): ").lower()
+        family_cholesterol = input("📌 Storia familiare di colesterolo alto? (y/n): ").lower()
 
-    # Organizza i dati in un dizionario
-    user_data = {
-        'age': age,
-        'weight': weight_lb,  # Peso in libbre
-        'height': height_inch,  # Altezza in pollici
-        'sys_bp': sys_bp,
-        'num_meds': num_meds,
-        'occup_danger': occup_danger,
-        'ls_danger': ls_danger,
-        'drinks_aweek': drinks_aweek,
-        'major_surgery_num': major_surgery_num,
-        'cholesterol': cholesterol,
-        'sex': sex,
-        'smoker': smoker,
-        'nic_other': nic_other,
-        'cannabis': cannabis,
-        'opioids': opioids,
-        'other_drugs': other_drugs,
-        'addiction': addiction,
-        'diabetes': diabetes,
-        'hds': hds,
-        'asthma': asthma,
-        'immune_defic': immune_defic,
-        'family_cancer': family_cancer,
-        'family_heart_disease': family_heart_disease,
-        'family_cholesterol': family_cholesterol
-    }
+        user_data = {
+            'weight': weight_lb,
+            'height': height_inch,
+            'sys_bp': sys_bp,
+            'num_meds': num_meds,
+            'occup_danger': occup_danger,
+            'ls_danger': ls_danger,
+            'drinks_aweek': drinks_aweek,
+            'major_surgery_num': major_surgery_num,
+            'cholesterol': cholesterol,
+            'sex': sex,
+            'smoker': smoker,
+            'nic_other': nic_other,
+            'cannabis': cannabis,
+            'opioids': opioids,
+            'other_drugs': other_drugs,
+            'addiction': addiction,
+            'diabetes': diabetes,
+            'hds': hds,
+            'asthma': asthma,
+            'immune_defic': immune_defic,
+            'family_cancer': family_cancer,
+            'family_heart_disease': family_heart_disease,
+            'family_cholesterol': family_cholesterol
+        }
 
-    return user_data
-
+        return user_data
+    except ValueError:
+        print("\n⚠️ Errore: Inserisci solo numeri validi per i valori numerici!\n")
+        return collect_user_data()
 
 # Carica il modello salvato
 model = joblib.load('../model/mlongevity_model.pkl')
@@ -118,10 +108,8 @@ user_data = collect_user_data()
 processed_user_data = preprocess_single_data(user_data)
 
 # Fai la previsione
-prediction = model.predict(processed_user_data)
+predicted_age = model.predict(processed_user_data)[0]
 
-# Stampa la previsione
-if prediction[0] == 1:
-    print("Previsione: longevità più alta della media.")
-else:
-    print("Previsione: longevità più bassa della media.")
+# Stampa la previsione dell'età
+print("\n🔮 **Previsione della longevità**:")
+print(f"🟢 Età stimata alla morte: {predicted_age:.2f} anni")
