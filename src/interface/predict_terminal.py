@@ -38,7 +38,7 @@ def preprocess_single_data(entry):
 
 # Funzione per raccogliere i dati dell'utente
 def collect_user_data():
-    print("\n🔍 Inserisci i dati per la previsione:\n")
+    print("\nInserisci i dati per la previsione:\n")
     try:
         weight_lb = float(input("Inserisci peso (in libbre): "))
         height_inch = float(input("Inserisci altezza (in pollici): "))
