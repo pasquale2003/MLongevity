@@ -1,72 +1,97 @@
 import json
-import os
 from collections import Counter
-import math
-
+import matplotlib.pyplot as plt
+from scipy.stats import skew, kurtosis
+import random  # Aggiunto per il campionamento casuale
 
 def load_data(file_path):
     """Carica il file JSON e restituisce i dati."""
     with open(file_path, 'r') as file:
         return json.load(file)
 
-
 def count_instances(data):
     """Conta il numero di istanze nel dataset."""
     return len(data)
-
 
 def calculate_average(data, key):
     """Calcola la media di un dato numerico specifico."""
     values = [instance[key] for instance in data if isinstance(instance.get(key), (int, float))]
     return sum(values) / len(values) if values else 0
 
-
 def count_categorical(data, key, value):
     """Conta il numero di istanze con un valore specifico in una chiave."""
     return sum(1 for instance in data if instance.get(key) == value)
-
 
 def count_distribution(data, key):
     """Conta la distribuzione di valori per una determinata chiave."""
     return Counter(instance.get(key) for instance in data if key in instance)
 
-def load_data(file_path):
-    """Carica il file JSON e restituisce i dati."""
-    with open(file_path, 'r') as file:
-        return json.load(file)
+def analyze_target_distribution(data, target='age'):
+    """Analizza la distribuzione della variabile target (età alla morte)."""
 
+    # Estrai i valori della variabile target
+    target_values = [instance[target] for instance in data if isinstance(instance.get(target), (int, float))]
 
-def calculate_average(data, key):
-    """Calcola la media di un dato numerico specifico."""
-    values = [instance.get(key) for instance in data if isinstance(instance.get(key), (int, float))]
-    return sum(values) / len(values) if values else 0
+    # Calcola skewness (asimmetria) e kurtosis (curtosi)
+    target_skewness = skew(target_values)
+    target_kurtosis = kurtosis(target_values)
 
+    # Istogramma della distribuzione
+    plt.figure(figsize=(10, 5))
+    plt.hist(target_values, bins=30, color='blue', alpha=0.7)
+    plt.axvline(x=sum(target_values) / len(target_values), color='red', linestyle='dashed', label='Media')
+    plt.title(f'Distribuzione della variabile target ({target})')
+    plt.xlabel(target)
+    plt.ylabel('Frequenza')
+    plt.legend()
+    plt.show()
 
-def calculate_std_dev(data, key, mean):
-    """Calcola la deviazione standard di un dato numerico specifico."""
-    values = [instance.get(key) for instance in data if isinstance(instance.get(key), (int, float))]
-    variance = sum((x - mean) ** 2 for x in values) / len(values) if values else 0
-    return math.sqrt(variance)
+    # Boxplot per identificare outlier
+    plt.figure(figsize=(8, 4))
+    plt.boxplot(target_values, vert=False, patch_artist=True, boxprops=dict(facecolor='blue'))
+    plt.title(f'Boxplot della variabile target ({target})')
+    plt.show()
 
+    # Stampa i risultati
+    print(f"\nAnalisi della distribuzione di {target}:")
+    print(f"- Skewness (Asimmetria): {target_skewness:.2f}")
+    print(f"- Kurtosis (Curtosi): {target_kurtosis:.2f}")
 
-def categorize_age(data, mean, std_dev):
-    """Categorizza le persone in base all'età rispetto alla media e alla deviazione standard."""
-    categories = {
-        "meno della media": 0,
-        "nella media": 0,
-        "più della media": 0
-    }
+    if target_skewness > 1:
+        print("📌 La distribuzione è positivamente asimmetrica (coda lunga a destra).")
+    elif target_skewness < -1:
+        print("📌 La distribuzione è negativamente asimmetrica (coda lunga a sinistra).")
+    else:
+        print("✅ La distribuzione è abbastanza simmetrica.")
 
-    for instance in data:
-        age = instance.get("age")
-        if isinstance(age, (int, float)):
-            if age < (mean - std_dev):
-                categories["meno della media"] += 1
-            elif age > (mean + std_dev):
-                categories["più della media"] += 1
-            else:
-                categories["nella media"] += 1
-    return categories
+    if target_kurtosis > 3:
+        print("📌 La distribuzione ha code più pesanti rispetto a una normale (più outlier).")
+    elif target_kurtosis < 3:
+        print("✅ La distribuzione ha code più leggere rispetto a una normale.")
+
+# Nuova funzione per calcolare la media dell'età di morte per fumatori e non fumatori
+def calculate_smoking_groups_average(data, smoker_key='smoker', death_age_key='age', sample_size=200):
+    """Calcola la media dell'età di morte per fumatori e non fumatori, usando un campionamento casuale."""
+
+    # Filtra fumatori e non fumatori
+    smokers = [instance for instance in data if instance.get(smoker_key) == 'y']
+    non_smokers = [instance for instance in data if instance.get(smoker_key) == 'n']
+
+    # Verifica che ci siano abbastanza dati per il campionamento
+    if len(smokers) >= sample_size and len(non_smokers) >= sample_size:
+        # Campiona casualmente 200 fumatori e 200 non fumatori
+        sampled_smokers = random.sample(smokers, sample_size)
+        sampled_non_smokers = random.sample(non_smokers, sample_size)
+
+        # Calcola la media dell'età di morte per i fumatori
+        avg_death_age_smokers = calculate_average(sampled_smokers, death_age_key)
+        # Calcola la media dell'età di morte per i non fumatori
+        avg_death_age_non_smokers = calculate_average(sampled_non_smokers, death_age_key)
+
+        return avg_death_age_smokers, avg_death_age_non_smokers
+    else:
+        print("Non ci sono abbastanza dati per eseguire il campionamento.")
+        return None, None
 
 def main():
     # Caricare i dati dal file JSON
@@ -109,13 +134,6 @@ def main():
         "family_cholesterol": count_categorical(data, 'family_cholesterol', 'y')
     }
 
-    # Calcolo media e deviazione standard dell'età
-    avg_age = calculate_average(data, 'age')
-    std_dev_age = calculate_std_dev(data, 'age', avg_age)
-
-    # Categorizzazione delle età
-    age_categories = categorize_age(data, avg_age, std_dev_age)
-
     # Stampare i risultati
     print(f"Numero di istanze: {num_instances}")
     print(f"Età media: {avg_age:.2f}")
@@ -139,10 +157,14 @@ def main():
     print(f"Malattie riscontrate: {diseases}")
     print(f"Storia familiare di malattie: {family_history}")
 
-    # Stampare i risultati
-    print(f"\nEtà media: {avg_age:.2f}")
-    print(f"Deviazione standard dell'età: {std_dev_age:.2f}")
-    print(f"Distribuzione delle categorie di età: {age_categories}")
+    # Analisi della distribuzione dell'età alla morte
+    analyze_target_distribution(data, target='age')
+
+    # Calcola la media dell'età di morte per fumatori e non fumatori
+    avg_death_age_smokers, avg_death_age_non_smokers = calculate_smoking_groups_average(data)
+    if avg_death_age_smokers is not None and avg_death_age_non_smokers is not None:
+        print(f"\nEtà media di morte per i fumatori: {avg_death_age_smokers:.2f}")
+        print(f"Età media di morte per i non fumatori: {avg_death_age_non_smokers:.2f}")
 
 if __name__ == '__main__':
     main()
